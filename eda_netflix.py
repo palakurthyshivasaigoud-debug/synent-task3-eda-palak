@@ -1,8 +1,8 @@
-﻿"""
+"""
 ============================================================
   SYNENT TECHNOLOGIES – DATA SCIENCE INTERNSHIP
   Task 3: Exploratory Data Analysis (EDA)
-  Name   : Palak
+  Name   : Palakurthy Shiva Sai Goud
   Dataset: Netflix Top 10 Weekly Rankings
 ============================================================
 
@@ -201,7 +201,7 @@ print("\n   Generating charts... (close each chart window to continue)")
 
 
 # --- Chart 1: Category Pie + Top 10 All-Time ---
-print("\n>> Chart 1/8: Content Category Overview")
+print("\n>> Chart 1/11: Content Category Overview")
 cat_counts = df_merged['category'].value_counts()
 fig, axes = plt.subplots(1, 2, figsize=(15, 5))
 colors = sns.color_palette('muted', len(cat_counts))
@@ -222,7 +222,7 @@ print("   Saved: 01_summary_overview.png")
 
 
 # --- Chart 2: Distribution of Weekly Hours ---
-print("\n>> Chart 2/8: Distribution of Weekly Hours Viewed")
+print("\n>> Chart 2/11: Distribution of Weekly Hours Viewed")
 data_m = df_merged['weekly_hours_viewed'].dropna() / 1e6
 plt.figure(figsize=(10, 4))
 plt.hist(data_m, bins=40, color='steelblue', edgecolor='white', alpha=0.85)
@@ -239,7 +239,7 @@ print("   Saved: 02_hours_distribution.png")
 
 
 # --- Chart 3: Correlation Heatmap ---
-print("\n>> Chart 3/8: Correlation Heatmap")
+print("\n>> Chart 3/11: Correlation Heatmap")
 plt.figure(figsize=(9, 6))
 mask = np.triu(np.ones_like(corr_matrix, dtype=bool))
 sns.heatmap(corr_matrix, mask=mask, annot=True, fmt='.2f',
@@ -253,7 +253,7 @@ print("   Saved: 03_correlation_heatmap.png")
 
 
 # --- Chart 4: Runtime vs Views + Rank vs Views ---
-print("\n>> Chart 4/8: Runtime vs Views & Rank vs Avg Viewership")
+print("\n>> Chart 4/11: Runtime vs Views & Rank vs Avg Viewership")
 fig, axes = plt.subplots(1, 2, figsize=(15, 5))
 sample = df_merged[['runtime', 'weekly_views', 'content_type']].dropna()
 for ctype in sample['content_type'].unique():
@@ -281,7 +281,7 @@ print("   Saved: 04_correlation_scatter.png")
 
 
 # --- Chart 5: Launch Type Comparison ---
-print("\n>> Chart 5/8: Normal vs Staggered Launch Comparison")
+print("\n>> Chart 5/11: Normal vs Staggered Launch Comparison")
 launch_group = df_merged.groupby('is_staggered_launch')['weekly_hours_viewed'].mean() / 1e6
 launch_group.index = ['Normal Launch', 'Staggered Launch']
 plt.figure(figsize=(6, 4))
@@ -300,7 +300,7 @@ print("   Saved: 05_launch_comparison.png")
 
 
 # --- Chart 6: Weekly Viewership Trend ---
-print("\n>> Chart 6/8: Weekly Global Viewership Trend")
+print("\n>> Chart 6/11: Weekly Global Viewership Trend")
 weekly_trend = df_merged.groupby('week')['weekly_hours_viewed'].sum() / 1e6
 plt.figure(figsize=(13, 5))
 plt.plot(weekly_trend.index, weekly_trend.values,
@@ -317,7 +317,7 @@ print("   Saved: 06_weekly_viewership_trend.png")
 
 
 # --- Chart 7: Films vs TV Trend ---
-print("\n>> Chart 7/8: Films vs TV Shows Viewership Trend")
+print("\n>> Chart 7/11: Films vs TV Shows Viewership Trend")
 type_trend = (df_merged.groupby(['week', 'content_type'])['weekly_hours_viewed']
               .sum().unstack(fill_value=0) / 1e6)
 plt.figure(figsize=(13, 5))
@@ -334,8 +334,25 @@ plt.show()
 print("   Saved: 07_films_vs_tv_trend.png")
 
 
-# --- Chart 8: Top Countries ---
-print("\n>> Chart 8/8: Top 10 Countries by Netflix Appearances")
+# --- Chart 8: Quarterly Trend ---
+print("\n>> Chart 8/11: Quarterly Viewership Pattern")
+quarterly = df_merged.groupby(['year', 'quarter'])['weekly_hours_viewed'].mean() / 1e6
+quarterly.index = [f'{y}-Q{q}' for y, q in quarterly.index]
+plt.figure(figsize=(12, 4))
+plt.bar(quarterly.index, quarterly.values,
+        color=sns.color_palette('muted', len(quarterly)), edgecolor='white')
+plt.title('Average Weekly Viewership by Quarter (Seasonality)', fontsize=13)
+plt.xlabel('Year – Quarter')
+plt.ylabel('Avg Hours Viewed (Millions)')
+plt.xticks(rotation=45, ha='right')
+plt.tight_layout()
+plt.savefig('data/charts/08_quarterly_trend.png', dpi=150, bbox_inches='tight')
+plt.show()
+print("   Saved: 08_quarterly_trend.png")
+
+
+# --- Chart 9: Top Countries ---
+print("\n>> Chart 9/11: Top 10 Countries by Netflix Appearances")
 top_countries = df_country['country_name'].value_counts().head(10)
 plt.figure(figsize=(10, 5))
 bars = plt.barh(top_countries.index[::-1], top_countries.values[::-1],
@@ -347,10 +364,78 @@ for bar in bars:
 plt.xlabel('Number of Top-10 Appearances')
 plt.title('Top 10 Countries by Netflix Top-10 Appearances', fontsize=13)
 plt.tight_layout()
-plt.savefig('data/charts/08_top_countries.png', dpi=150, bbox_inches='tight')
+plt.savefig('data/charts/09_top_countries.png', dpi=150, bbox_inches='tight')
 plt.show()
-print("   Saved: 08_top_countries.png")
+print("   Saved: 09_top_countries.png")
 
+
+# --- Chart 10: Country Content Preference (Unique Titles + Avg Longevity) ---
+print("\n>> Chart 10/11: Films vs TV Preference by Top 10 Countries")
+
+# Top 10 countries by number of UNIQUE titles (meaningful diversity metric)
+top10_countries = (df_country.groupby('country_name')['show_title']
+                   .nunique().sort_values(ascending=False).head(10).index.tolist())
+country_sub = df_country[df_country['country_name'].isin(top10_countries)].copy()
+
+# Panel A: Unique title count per content type (stacked bar)
+unique_pivot = (country_sub.groupby(['country_name', 'content_type'])['show_title']
+                .nunique().unstack(fill_value=0))
+unique_pivot = unique_pivot.loc[
+    unique_pivot.sum(axis=1).sort_values(ascending=False).index]
+
+# Panel B: Avg cumulative weeks in top 10 by content type
+longevity = (country_sub.groupby(['country_name', 'content_type'])
+             ['cumulative_weeks_in_top_10'].mean().unstack(fill_value=0))
+longevity = longevity.loc[unique_pivot.index]  # same country order
+
+fig, axes = plt.subplots(1, 2, figsize=(16, 6))
+
+# --- Subplot A ---
+unique_pivot.plot(kind='bar', ax=axes[0],
+                  color=['steelblue', 'coral'], edgecolor='white', width=0.65)
+axes[0].set_title('Unique Title Diversity – Films vs TV\n(Top 10 Countries)', fontsize=12)
+axes[0].set_xlabel('Country')
+axes[0].set_ylabel('Number of Unique Titles')
+axes[0].tick_params(axis='x', rotation=35)
+axes[0].legend(title='Content Type')
+for container in axes[0].containers:
+    axes[0].bar_label(container, fontsize=7, padding=2)
+
+# --- Subplot B ---
+longevity.plot(kind='bar', ax=axes[1],
+               color=['steelblue', 'coral'], edgecolor='white', width=0.65)
+axes[1].set_title('Avg Weeks in Top 10 – Films vs TV\n(Top 10 Countries)', fontsize=12)
+axes[1].set_xlabel('Country')
+axes[1].set_ylabel('Avg Cumulative Weeks in Top 10')
+axes[1].tick_params(axis='x', rotation=35)
+axes[1].legend(title='Content Type')
+for container in axes[1].containers:
+    axes[1].bar_label(container, fmt='%.1f', fontsize=7, padding=2)
+
+plt.suptitle('Country Content Preference Analysis', fontsize=14, y=1.01)
+plt.tight_layout()
+plt.savefig('data/charts/10_country_content_preference.png', dpi=150, bbox_inches='tight')
+plt.show()
+print("   Saved: 10_country_content_preference.png")
+
+
+# --- Chart 11: Boxplots ---
+print("\n>> Chart 11/11: Boxplots – Outlier Detection")
+box_cols = [c for c in ['weekly_hours_viewed', 'weekly_views', 'runtime',
+                         'cumulative_weeks_in_top_10'] if c in df_merged.columns]
+fig, axes = plt.subplots(1, len(box_cols), figsize=(15, 5))
+for i, col in enumerate(box_cols):
+    axes[i].boxplot(df_merged[col].dropna(), patch_artist=True,
+                    boxprops=dict(facecolor='lightsteelblue', color='steelblue'),
+                    medianprops=dict(color='red', linewidth=2),
+                    flierprops=dict(marker='o', color='grey', alpha=0.3))
+    axes[i].set_title(col.replace('_', ' ').title(), fontsize=10)
+    axes[i].set_ylabel('Value')
+plt.suptitle('Boxplots – Outlier Detection in Key Metrics', fontsize=13, y=1.01)
+plt.tight_layout()
+plt.savefig('data/charts/11_boxplots.png', dpi=150, bbox_inches='tight')
+plt.show()
+print("   Saved: 11_boxplots.png")
 
 print("\n   [Visualization Complete]")
 
@@ -387,6 +472,6 @@ print(f"""
 """)
 
 print("=" * 60)
-print("  All 8 important charts saved in: data/charts/")
+print("  All 11 charts saved in: data/charts/")
 print("  Task 3 – EDA Complete!")
 print("=" * 60)

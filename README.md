@@ -91,6 +91,6 @@ synent-task3-eda-palak/
 
 ## Author
 
-Palak
+Palakurthy Shiva Sai Goud
 
 Submitted for Synent Technologies Data Science Internship - Task 3.
