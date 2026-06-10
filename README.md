@@ -10,7 +10,7 @@ Netflix releases weekly ranking data for films and TV shows. I used this dataset
 
 ## Dataset
 
-Source: Netflix Top 10 dataset from Kaggle / Netflix public ranking data.
+**Source:** [Official Netflix Viewership Database](https://www.kaggle.com/datasets/sujaykapadnis/official-netflix-streaming-data) - Kaggle
 
 Files used:
 
