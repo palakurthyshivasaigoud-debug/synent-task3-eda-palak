@@ -197,9 +197,13 @@ print("\n   Generating 6 charts... (close each window to continue)\n")
 
 # ── Helper: save + show ───────────────────────────────────────
 def _save(path, title=None):
+    fig = plt.gcf()
     if title:
-        plt.gcf().suptitle(title, fontsize=14, fontweight='bold', y=1.01)
-    plt.tight_layout()
+        fig.suptitle(title, fontsize=13, fontweight='bold')
+        # rect=[left, bottom, right, top] — reserves top 7% for the suptitle
+        plt.tight_layout(rect=[0, 0, 1, 0.93])
+    else:
+        plt.tight_layout()
     plt.savefig(path, dpi=150, bbox_inches='tight')
     plt.show()
     print(f"   Saved: {os.path.basename(path)}")
@@ -215,7 +219,7 @@ print(">> Chart 1/6: Content Category Overview")
 cat_counts = df_merged['content_type'].value_counts()
 top10      = df_popular.nlargest(10, 'hours_viewed_first_91_days')
 
-fig, axes = plt.subplots(1, 2, figsize=(16, 6))
+fig, axes = plt.subplots(1, 2, figsize=(13, 5))
 
 # Pie chart
 pie_colors = ['#4A90D9', '#E8744A']
@@ -260,7 +264,7 @@ box_labels = {
     'cumulative_weeks_in_top_10' : 'Weeks in\nTop 10',
 }
 
-fig, axes = plt.subplots(1, 2, figsize=(16, 5))
+fig, axes = plt.subplots(1, 2, figsize=(13, 4.5))
 
 # Histogram
 axes[0].hist(data_m, bins=40, color='steelblue', edgecolor='white', alpha=0.85)
@@ -304,7 +308,7 @@ _save('data/charts/02_viewership_distribution.png', 'Viewership Distribution & O
 # ─────────────────────────────────────────────────────────────
 print("\n>> Chart 3/6: Correlation & Rank Analysis")
 
-fig, axes = plt.subplots(1, 2, figsize=(16, 6))
+fig, axes = plt.subplots(1, 2, figsize=(13, 5))
 
 # Heatmap
 mask = np.triu(np.ones_like(corr_matrix, dtype=bool))
@@ -344,7 +348,7 @@ type_trend = (df_merged.groupby(['week', 'content_type'])['weekly_hours_viewed']
 quarterly = df_merged.groupby(['year', 'quarter'])['weekly_hours_viewed'].mean() / 1e6
 quarterly.index = [f'{y}-Q{q}' for y, q in quarterly.index]
 
-fig, axes = plt.subplots(2, 1, figsize=(14, 10), gridspec_kw={'hspace': 0.45})
+fig, axes = plt.subplots(2, 1, figsize=(12, 8), gridspec_kw={'hspace': 0.50})
 
 # Line chart: Films vs TV trend
 line_colors = {'Films': '#4A90D9', 'TV Shows': '#E8744A'}
@@ -396,7 +400,7 @@ longevity = (country_sub.groupby(['country_name', 'content_type'])
 # Align to the same country order as diversity chart
 longevity = longevity.reindex(top15_names, fill_value=0)
 
-fig, axes = plt.subplots(1, 2, figsize=(18, 7))
+fig, axes = plt.subplots(1, 2, figsize=(15, 6))
 
 # Horizontal bar: unique show diversity
 bar_cols = sns.color_palette('Blues_r', len(country_unique))
@@ -438,7 +442,7 @@ launch_group.index = ['Normal Launch', 'Staggered Launch']
 
 sample = df_merged[['runtime', 'weekly_views', 'content_type']].dropna()
 
-fig, axes = plt.subplots(1, 2, figsize=(16, 5))
+fig, axes = plt.subplots(1, 2, figsize=(13, 4.5))
 
 # Launch bar chart
 launch_colors = ['#4A90D9', '#E8744A']
