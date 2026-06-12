@@ -20,10 +20,21 @@ df_popular['hours_viewed_first_91_days'] = pd.to_numeric(df_popular['hours_viewe
 df_popular['views_first_91_days']        = pd.to_numeric(df_popular['views_first_91_days'], errors='coerce')
 df_popular['runtime']                    = pd.to_numeric(df_popular['runtime'], errors='coerce')
 
-# Merge: global weekly data + all-time popularity stats
+# -------------------------------------------------------------------
+# FIX: Clean season_title before merging.
+# The original merge on ['show_title', 'category'] introduced duplicate
+# rows because some shows appear multiple seasons in most-popular.csv.
+# Using season_title as an additional key gives an exact match and keeps
+# the merged shape identical to all-weeks-global (5,160 rows).
+# -------------------------------------------------------------------
+df_global['season_title']  = df_global['season_title'].fillna('N/A').str.strip()
+df_popular['season_title'] = df_popular['season_title'].fillna('N/A').str.strip()
+
+# Merge: global weekly data + all-time popularity stats (no duplicates)
 df_merged = df_global.merge(
-    df_popular[['show_title', 'category', 'hours_viewed_first_91_days', 'views_first_91_days']],
-    on=['show_title', 'category'],
+    df_popular[['show_title', 'category', 'season_title',
+                'hours_viewed_first_91_days', 'views_first_91_days']],
+    on=['show_title', 'category', 'season_title'],
     how='left'
 )
 

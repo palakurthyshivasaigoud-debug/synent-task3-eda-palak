@@ -25,19 +25,21 @@ Files used:
 
 1. Loaded the global, country, and most-popular datasets.
 2. Parsed date columns and converted numeric fields for analysis.
-3. Checked missing values and duplicate records.
-4. Created content type fields for Films and TV Shows.
-5. Calculated summary statistics for titles, weeks, viewership, ranks, and categories.
-6. Built correlation analysis for rank, hours viewed, weekly views, runtime, and weeks in Top 10.
-7. Generated charts to support the final insights.
+3. Fixed the data merge to use `season_title` as an additional join key, preventing duplicate rows from multi-season shows.
+4. Checked missing values and duplicate records.
+5. Created content type fields for Films and TV Shows.
+6. Calculated summary statistics for titles, weeks, viewership, ranks, and categories.
+7. Built correlation analysis for rank, hours viewed, weekly views, runtime, and weeks in Top 10.
+8. Generated 6 consolidated, insight-driven charts.
 
 ## Key Insights
 
-- TV Shows and Films have a nearly balanced share in the Top 10 dataset.
-- Rank 1 titles receive much higher average viewing hours than Rank 10 titles.
-- `weekly_hours_viewed` and `weekly_views` have the strongest positive relationship among the selected numeric fields.
-- Country-level data shows which regions repeatedly appear in Netflix Top 10 rankings.
-- Staggered launch titles were compared against normal launches to understand release strategy impact.
+- **Squid Game** is the most-watched Netflix title ever with 2,205 million hours viewed in its first 91 days.
+- Films and TV Shows have an equal 50% share in the global Top 10 dataset.
+- Rank #1 titles receive **8.7x more** average viewing hours than Rank #10 titles.
+- **Staggered launches** outperform normal releases (22.2M vs 18.7M avg hrs/week).
+- `weekly_hours_viewed` and `weekly_views` have the strongest positive correlation (r = 0.66).
+- Country-level diversity analysis shows English-speaking countries tend to have the widest spread of unique titles in their Top 10.
 
 ## Visualizations
 
@@ -45,14 +47,12 @@ Charts are saved in `data/charts/`.
 
 | Chart | Description |
 | --- | --- |
-| `01_summary_overview.png` | Category share and most-watched titles |
-| `02_hours_distribution.png` | Distribution of weekly viewing hours |
-| `03_correlation_heatmap.png` | Correlation matrix |
-| `04_correlation_scatter.png` | Runtime/view and rank/view relationships |
-| `05_launch_comparison.png` | Normal vs staggered launch comparison |
-| `06_weekly_viewership_trend.png` | Weekly global viewing trend |
-| `07_films_vs_tv_trend.png` | Films and TV Shows over time |
-| `08_top_countries.png` | Countries with the most Top 10 appearances |
+| `01_content_overview.png` | Content type share (pie) + Top 10 Most-Watched Titles all-time (bar) |
+| `02_viewership_distribution.png` | Weekly hours viewed histogram + Boxplots of key metrics |
+| `03_correlation_analysis.png` | Feature correlation heatmap + Avg viewership by weekly rank |
+| `04_viewership_trends.png` | Films vs TV Shows weekly trend (line) + Quarterly seasonality (bar) |
+| `05_country_analysis.png` | Top 15 countries by content diversity + Avg longevity by content type |
+| `06_launch_strategy.png` | Normal vs Staggered launch comparison + Runtime vs Weekly Views scatter |
 
 ## How to Run
 
